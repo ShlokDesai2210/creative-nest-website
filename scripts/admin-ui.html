@@ -63,21 +63,17 @@
             </div>
           </div>
 
-          <!-- Image Upload -->
+          <!-- Image Gallery Upload -->
           <div>
-            <label class="block text-sm font-semibold mb-1">Product Image (JPEG/PNG)</label>
+            <label class="block text-sm font-semibold mb-1">Product Images</label>
             
-            <!-- Existing Image Preview (Hidden by default) -->
-            <div id="existingImageContainer" class="hidden mb-3 p-3 bg-gray-50 rounded-lg border border-gray-200 flex items-center justify-between">
-              <div class="flex items-center gap-3">
-                <img id="existingImagePreview" src="" class="w-12 h-12 rounded object-cover border border-gray-300">
-                <span class="text-sm text-gray-600 font-medium">Current Image</span>
+            <!-- Image Gallery (Thumbnails) -->
+            <div id="imageGalleryContainer" class="hidden mb-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+              <p class="text-xs text-gray-500 mb-2 uppercase tracking-wider font-semibold">Current Gallery</p>
+              <div id="imageGalleryGrid" class="flex flex-wrap gap-3">
+                <!-- Rendered via JS -->
               </div>
-              <button type="button" onclick="markImageForRemoval()" class="text-xs px-3 py-1.5 bg-red-100 text-red-600 font-semibold rounded hover:bg-red-200 transition-colors">
-                Remove
-              </button>
             </div>
-            <input type="hidden" id="removeImageFlag" value="false">
 
             <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-[#C9A87C] transition-colors bg-gray-50">
               <div class="space-y-1 text-center">
@@ -85,12 +81,12 @@
                   <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
                 <div class="flex text-sm text-gray-600 justify-center">
-                  <label for="imageUpload" class="relative cursor-pointer bg-white rounded-md font-medium text-[#C9A87C] hover:text-[#b59266] focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-[#C9A87C]">
+                  <label for="imageUpload" class="relative cursor-pointer bg-white rounded-md font-medium text-[#C9A87C] hover:text-[#b09065] focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-[#C9A87C]">
                     <span>Upload a file</span>
-                    <input id="imageUpload" name="imageUpload" type="file" accept="image/*" class="sr-only">
+                    <input id="imageUpload" name="imageUpload" type="file" class="sr-only" accept="image/jpeg, image/png">
                   </label>
                 </div>
-                <p class="text-xs text-gray-500" id="fileNameDisplay">Drag and drop or click</p>
+                <p class="text-xs text-gray-500" id="fileNameDisplay">Drag and drop or click to add image</p>
               </div>
             </div>
 
@@ -102,7 +98,7 @@
               </div>
               <div class="mt-3 flex justify-end gap-2">
                 <button type="button" onclick="cancelCrop()" class="px-3 py-1.5 text-xs bg-gray-200 text-gray-700 rounded font-semibold hover:bg-gray-300 transition-colors">Cancel</button>
-                <button type="button" onclick="applyCrop()" class="px-3 py-1.5 text-xs bg-[#C9A87C] text-white rounded font-semibold hover:bg-[#b09065] transition-colors">Apply Crop</button>
+                <button type="button" id="applyCropBtn" onclick="applyCrop()" class="px-3 py-1.5 text-xs bg-[#C9A87C] text-white rounded font-semibold hover:bg-[#b09065] transition-colors">Upload & Add to Gallery</button>
               </div>
             </div>
 
@@ -201,13 +197,37 @@
 
     // Handle File Input Change (Cropper)
     let cropper = null;
-    let croppedBlob = null;
+    let pendingImages = [];
+
+    function renderGallery() {
+      const container = document.getElementById('imageGalleryContainer');
+      const grid = document.getElementById('imageGalleryGrid');
+      
+      if (pendingImages.length === 0) {
+        container.classList.add('hidden');
+        grid.innerHTML = '';
+        return;
+      }
+      
+      container.classList.remove('hidden');
+      grid.innerHTML = pendingImages.map((img, idx) => `
+        <div class="relative w-16 h-16 rounded-lg overflow-hidden border border-gray-300">
+          <img src="${img}" class="w-full h-full object-cover">
+          <button type="button" onclick="removeImage(${idx})" class="absolute top-0.5 right-0.5 bg-red-500 text-white rounded-full p-0.5 hover:bg-red-600 shadow-sm" title="Remove image">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function removeImage(idx) {
+      pendingImages.splice(idx, 1);
+      renderGallery();
+    }
 
     document.getElementById('imageUpload').addEventListener('change', function(e) {
       if (e.target.files.length > 0) {
         const file = e.target.files[0];
-        
-        // Ensure it's an image
         if (!file.type.startsWith('image/')) {
           alert('Please select an image file (JPEG/PNG)');
           return;
@@ -218,52 +238,49 @@
           document.getElementById('cropImage').src = event.target.result;
           document.getElementById('cropSection').classList.remove('hidden');
           document.getElementById('fileNameDisplay').innerText = "Crop your image below";
-          
-          if (cropper) { cropper.destroy(); }
-          
+          if (cropper) cropper.destroy();
           const imgElement = document.getElementById('cropImage');
-          cropper = new Cropper(imgElement, {
-            aspectRatio: 1, // 1:1 Square aspect ratio!
-            viewMode: 1,
-            autoCropArea: 1,
-            background: false
-          });
+          cropper = new Cropper(imgElement, { aspectRatio: 1, viewMode: 1, autoCropArea: 1, background: false });
         };
         reader.readAsDataURL(file);
       }
     });
 
-    function applyCrop() {
+    async function applyCrop() {
       if (!cropper) return;
-      cropper.getCroppedCanvas({
-        width: 800,
-        height: 800,
-        fillColor: '#fff',
-        imageSmoothingEnabled: true,
-        imageSmoothingQuality: 'high',
-      }).toBlob((blob) => {
-        croppedBlob = blob;
-        document.getElementById('cropSection').classList.add('hidden');
-        document.getElementById('fileNameDisplay').innerText = "✅ Image cropped and ready!";
-        if (cropper) { cropper.destroy(); cropper = null; }
+      const btn = document.getElementById('applyCropBtn');
+      const originalText = btn.innerText;
+      btn.innerText = 'Uploading...';
+      btn.disabled = true;
+
+      cropper.getCroppedCanvas({ width: 800, height: 800, fillColor: '#fff' }).toBlob(async (blob) => {
+        try {
+          const formData = new FormData();
+          formData.append('image', blob, 'gallery-image.jpg');
+          const uploadRes = await fetch('/api/upload', { method: 'POST', body: formData });
+          const uploadData = await uploadRes.json();
+          pendingImages.push(uploadData.url);
+          
+          document.getElementById('cropSection').classList.add('hidden');
+          document.getElementById('fileNameDisplay').innerText = "✅ Added! Add another if you like.";
+          if (cropper) { cropper.destroy(); cropper = null; }
+          renderGallery();
+        } catch(err) {
+          alert('Upload failed: ' + err.message);
+        } finally {
+          btn.innerText = originalText;
+          btn.disabled = false;
+        }
       }, 'image/jpeg', 0.9);
     }
 
     function cancelCrop() {
       document.getElementById('cropSection').classList.add('hidden');
       document.getElementById('imageUpload').value = '';
-      croppedBlob = null;
-      document.getElementById('fileNameDisplay').innerText = "Drag and drop or click";
+      document.getElementById('fileNameDisplay').innerText = "Drag and drop or click to add image";
       if (cropper) { cropper.destroy(); cropper = null; }
     }
     
-    // Mark image for removal
-    function markImageForRemoval() {
-      document.getElementById('removeImageFlag').value = 'true';
-      document.getElementById('existingImageContainer').classList.add('hidden');
-      document.getElementById('fileNameDisplay').innerText = 'Existing image removed. Upload new if needed.';
-    }
-
     // Start Editing
     function startEdit(id) {
       const p = products.find(prod => prod.id === id);
@@ -278,18 +295,9 @@
       document.getElementById('inStock').checked = p.inStock;
       document.getElementById('featured').checked = p.featured;
       
-      document.getElementById('removeImageFlag').value = 'false';
-      
-      if (p.images && p.images.length > 0) {
-        document.getElementById('existingImagePreview').src = p.images[0];
-        document.getElementById('existingImageContainer').classList.remove('hidden');
-        document.getElementById('existingImageContainer').classList.add('flex');
-        document.getElementById('fileNameDisplay').innerText = 'Upload new image to replace existing';
-      } else {
-        document.getElementById('existingImageContainer').classList.add('hidden');
-        document.getElementById('existingImageContainer').classList.remove('flex');
-        document.getElementById('fileNameDisplay').innerText = 'Drag and drop or click';
-      }
+      pendingImages = p.images ? [...p.images] : [];
+      renderGallery();
+      document.getElementById('fileNameDisplay').innerText = 'Drag and drop or click to add more images';
         
       document.getElementById('submitBtn').innerText = 'Update Product';
       document.getElementById('cancelEditBtn').classList.remove('hidden');
@@ -301,14 +309,13 @@
     // Cancel Editing
     function cancelEdit() {
       editingId = null;
+      pendingImages = [];
       document.getElementById('addProductForm').reset();
-      cancelCrop(); // Ensure cropper is closed
-      document.getElementById('fileNameDisplay').innerText = 'Drag and drop or click';
+      cancelCrop(); 
+      document.getElementById('fileNameDisplay').innerText = 'Drag and drop or click to add image';
       document.getElementById('submitBtn').innerText = 'Add Product';
       document.getElementById('cancelEditBtn').classList.add('hidden');
-      document.getElementById('existingImageContainer').classList.add('hidden');
-      document.getElementById('existingImageContainer').classList.remove('flex');
-      document.getElementById('removeImageFlag').value = 'false';
+      renderGallery();
       renderProducts();
     }
 
@@ -321,18 +328,6 @@
       btn.disabled = true;
 
       try {
-        let imageUrl = null;
-        
-        // 1. Upload Cropped Image if present
-        if (croppedBlob) {
-          const formData = new FormData();
-          formData.append('image', croppedBlob, 'product-image.jpg');
-          const uploadRes = await fetch('/api/upload', { method: 'POST', body: formData });
-          const uploadData = await uploadRes.json();
-          imageUrl = uploadData.url;
-        }
-
-        // 2. Save Product
         const payload = {
           name: document.getElementById('name').value,
           price: parseInt(document.getElementById('price').value),
@@ -342,8 +337,7 @@
           inStock: document.getElementById('inStock').checked,
           featured: document.getElementById('featured').checked,
           tags: [],
-          images: imageUrl ? [imageUrl] : [],
-          removeImage: document.getElementById('removeImageFlag').value === 'true'
+          images: pendingImages
         };
 
         const url = isUpdating ? `/api/products/${editingId}` : '/api/products';
@@ -357,12 +351,11 @@
 
         cancelEdit(); // Reset form and reload
         await loadData();
-        
       } catch (err) {
         alert('Error saving product: ' + err.message);
       } finally {
         btn.disabled = false;
-        if (!editingId) btn.innerText = 'Add Product'; // Only reset if we didn't call cancelEdit
+        if (!editingId) btn.innerText = 'Add Product';
       }
     }
 

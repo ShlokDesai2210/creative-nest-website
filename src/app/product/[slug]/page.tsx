@@ -13,6 +13,7 @@ import {
 import { getWhatsAppUrl, getWhatsAppOrderUrl } from "@/lib/whatsapp";
 import ProductCard from "@/components/ProductCard";
 import SoldOutBadge from "@/components/SoldOutBadge";
+import ProductGallery from "@/components/ProductGallery";
 import {
   ArrowLeft,
   Check,
@@ -193,45 +194,13 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
       {/* Product Detail Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-          {/* Left Column (60%): Large Image / Placeholder */}
+          {/* Left Column (60%): Image Gallery */}
           <div className="lg:col-span-7">
-            <div className="relative aspect-square w-full bg-brand-cream rounded-2xl border border-brand-beige-dark/30 overflow-hidden shadow-xs flex items-center justify-center">
-              {/* Sold Out Ribbon Badge */}
-              {!product.inStock && <SoldOutBadge />}
-
-              {hasImage ? (
-                <Image
-                  src={getImagePath(product.images[0])}
-                  alt={product.name}
-                  fill
-                  priority
-                  sizes="(max-width: 1024px) 100vw, 58vw"
-                  className={`object-cover transition-transform duration-500 hover:scale-105 ${
-                    !product.inStock ? "grayscale opacity-60" : ""
-                  }`}
-                />
-              ) : (
-                <div
-                  className={`flex flex-col items-center justify-center p-8 text-center ${
-                    !product.inStock ? "grayscale opacity-50" : ""
-                  }`}
-                >
-                  <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-brand-white flex items-center justify-center shadow-sm mb-4 border border-brand-beige-dark/20">
-                    <IconComponent
-                      className="w-12 h-12 sm:w-14 sm:h-14 text-brand-gold stroke-[1.5]"
-                      aria-hidden="true"
-                    />
-                  </div>
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-brand-white/80 rounded-full text-xs font-semibold tracking-wider uppercase text-brand-charcoal-light/70 border border-brand-beige-dark/30">
-                    <Sparkles className="w-3.5 h-3.5 text-brand-gold" aria-hidden="true" />
-                    <span>Handmade with Love</span>
-                  </div>
-                  <p className="text-xs text-brand-charcoal-light/60 mt-2 font-medium">
-                    Creative Nest by Diya
-                  </p>
-                </div>
-              )}
-            </div>
+            <ProductGallery 
+              images={product.images} 
+              productName={product.name} 
+              inStock={product.inStock} 
+            />
           </div>
 
           {/* Right Column (40%): Product Details */}
