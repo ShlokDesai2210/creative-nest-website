@@ -67,6 +67,34 @@ app.post("/api/products", (req, res) => {
   }
 });
 
+// Edit existing product
+app.put("/api/products/:id", (req, res) => {
+  try {
+    const data = JSON.parse(fs.readFileSync(dataFile, "utf-8"));
+    const index = data.products.findIndex((p) => p.id === req.params.id);
+    
+    if (index !== -1) {
+      const existing = data.products[index];
+      const updated = { ...existing, ...req.body };
+      
+      // Keep existing images if no new image was uploaded
+      if (!req.body.images || req.body.images.length === 0) {
+        updated.images = existing.images;
+      }
+      
+      updated.slug = updated.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "");
+      data.products[index] = updated;
+      
+      fs.writeFileSync(dataFile, JSON.stringify(data, null, 2) + "\n");
+      res.json({ success: true, product: updated });
+    } else {
+      res.status(404).json({ error: "Product not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Delete product
 app.delete("/api/products/:id", (req, res) => {
   try {

@@ -96,12 +96,15 @@
               <input type="checkbox" id="featured" checked class="w-5 h-5 text-[#C9A87C] rounded focus:ring-[#C9A87C]">
               <span class="text-sm font-semibold">Featured</span>
             </label>
+                 <!-- Submit -->
+          <div class="flex gap-2 mt-4">
+            <button type="button" id="cancelEditBtn" onclick="cancelEdit()" class="hidden w-1/3 bg-gray-200 text-gray-800 font-semibold py-3 rounded-xl hover:bg-gray-300 transition-colors">
+              Cancel
+            </button>
+            <button type="submit" id="submitBtn" class="flex-1 bg-gray-900 text-white font-semibold py-3 rounded-xl hover:bg-gray-800 transition-colors">
+              Add Product
+            </button>
           </div>
-
-          <!-- Submit -->
-          <button type="submit" id="submitBtn" class="w-full bg-gray-900 text-white font-semibold py-3 rounded-xl hover:bg-gray-800 transition-colors mt-4">
-            Add Product
-          </button>
         </form>
       </div>
 
@@ -120,6 +123,7 @@
   <script>
     let categories = [];
     let products = [];
+    let editingId = null;
 
     // Initialize
     async function loadData() {
@@ -144,18 +148,21 @@
       }
       
       list.innerHTML = products.map(p => `
-        <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex gap-4 items-center">
+        <div class="bg-white rounded-2xl p-4 shadow-sm border ${editingId === p.id ? 'border-[#C9A87C] ring-1 ring-[#C9A87C]' : 'border-gray-100'} flex gap-4 items-center transition-all">
           <div class="w-20 h-20 bg-gray-100 rounded-xl flex-shrink-0 overflow-hidden flex items-center justify-center">
             ${p.images && p.images[0] ? `<img src="${p.images[0]}" class="w-full h-full object-cover">` : '📸'}
           </div>
           <div class="flex-1 min-w-0">
             <h3 class="font-bold text-gray-900 truncate">${p.name}</h3>
             <p class="text-sm text-gray-500">₹${p.price.toLocaleString('en-IN')} • ${categories.find(c => c.slug === p.category)?.name}</p>
-            <div class="mt-2 flex gap-2">
+            <div class="mt-2 flex flex-wrap gap-2">
               <button onclick="toggleStock('${p.id}')" class="text-xs px-2 py-1 rounded-md font-semibold ${p.inStock ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'} hover:opacity-80 transition-opacity">
                 ${p.inStock ? 'In Stock' : 'Sold Out'}
               </button>
-              <button onclick="deleteProduct('${p.id}')" class="text-xs px-2 py-1 bg-gray-100 hover:bg-red-100 hover:text-red-600 text-gray-600 rounded-md font-semibold transition-colors">
+              <button onclick="startEdit('${p.id}')" class="text-xs px-2 py-1 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-md font-semibold transition-colors">
+                Edit
+              </button>
+              <button onclick="deleteProduct('${p.id}')" class="text-xs px-2 py-1 bg-gray-50 hover:bg-red-100 hover:text-red-600 text-gray-600 rounded-md font-semibold transition-colors">
                 Delete
               </button>
             </div>
@@ -170,12 +177,48 @@
         document.getElementById('fileNameDisplay').innerText = e.target.files[0].name;
       }
     });
+    
+    // Start Editing
+    function startEdit(id) {
+      const p = products.find(prod => prod.id === id);
+      if (!p) return;
+      
+      editingId = id;
+      document.getElementById('name').value = p.name;
+      document.getElementById('price').value = p.price;
+      document.getElementById('originalPrice').value = p.originalPrice || '';
+      document.getElementById('category').value = p.category;
+      document.getElementById('description').value = p.description || '';
+      document.getElementById('inStock').checked = p.inStock;
+      document.getElementById('featured').checked = p.featured;
+      
+      document.getElementById('fileNameDisplay').innerText = (p.images && p.images.length > 0) 
+        ? 'Upload new image to replace existing' 
+        : 'Drag and drop or click';
+        
+      document.getElementById('submitBtn').innerText = 'Update Product';
+      document.getElementById('cancelEditBtn').classList.remove('hidden');
+      
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      renderProducts(); // Update highlight
+    }
+    
+    // Cancel Editing
+    function cancelEdit() {
+      editingId = null;
+      document.getElementById('addProductForm').reset();
+      document.getElementById('fileNameDisplay').innerText = 'Drag and drop or click';
+      document.getElementById('submitBtn').innerText = 'Add Product';
+      document.getElementById('cancelEditBtn').classList.add('hidden');
+      renderProducts();
+    }
 
-    // Add Product
+    // Add or Update Product
     async function handleAddProduct(e) {
       e.preventDefault();
       const btn = document.getElementById('submitBtn');
-      btn.innerText = 'Adding...';
+      const isUpdating = editingId !== null;
+      btn.innerText = isUpdating ? 'Updating...' : 'Adding...';
       btn.disabled = true;
 
       try {
@@ -192,7 +235,7 @@
         }
 
         // 2. Save Product
-        const newProduct = {
+        const payload = {
           name: document.getElementById('name').value,
           price: parseInt(document.getElementById('price').value),
           originalPrice: document.getElementById('originalPrice').value ? parseInt(document.getElementById('originalPrice').value) : null,
@@ -204,35 +247,36 @@
           images: imageUrl ? [imageUrl] : []
         };
 
-        await fetch('/api/products', {
-          method: 'POST',
+        const url = isUpdating ? \`/api/products/\${editingId}\` : '/api/products';
+        const method = isUpdating ? 'PUT' : 'POST';
+
+        await fetch(url, {
+          method: method,
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(newProduct)
+          body: JSON.stringify(payload)
         });
 
-        // Reset form and reload
-        document.getElementById('addProductForm').reset();
-        document.getElementById('fileNameDisplay').innerText = 'Drag and drop or click';
+        cancelEdit(); // Reset form and reload
         await loadData();
         
       } catch (err) {
-        alert('Error adding product: ' + err.message);
+        alert('Error saving product: ' + err.message);
       } finally {
-        btn.innerText = 'Add Product';
         btn.disabled = false;
+        if (!editingId) btn.innerText = 'Add Product'; // Only reset if we didn't call cancelEdit
       }
     }
 
     // Toggle Stock
     async function toggleStock(id) {
-      await fetch(`/api/products/${id}/stock`, { method: 'PATCH' });
+      await fetch(\`/api/products/\${id}/stock\`, { method: 'PATCH' });
       loadData();
     }
 
     // Delete Product
     async function deleteProduct(id) {
       if(confirm('Are you sure you want to delete this product?')) {
-        await fetch(`/api/products/${id}`, { method: 'DELETE' });
+        await fetch(\`/api/products/\${id}\`, { method: 'DELETE' });
         loadData();
       }
     }
