@@ -3,9 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Creative Nest by Diya — Admin Dashboard</title>
+  <title>Admin Dashboard — Creative Nest by Diya</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
   <style>
     body { font-family: 'Inter', sans-serif; background-color: #F5F0EB; color: #1A1A1A; }
     .gold-btn { background-color: #C9A87C; color: white; transition: all 0.2s; }
@@ -91,6 +93,19 @@
                 <p class="text-xs text-gray-500" id="fileNameDisplay">Drag and drop or click</p>
               </div>
             </div>
+
+            <!-- Cropper Section (Hidden by default) -->
+            <div id="cropSection" class="hidden mt-3 p-3 bg-white rounded-lg border border-gray-200 shadow-inner">
+              <p class="text-xs font-semibold mb-2 text-gray-700 uppercase tracking-wider">Adjust Image (Square Crop)</p>
+              <div class="w-full h-64 bg-gray-100 rounded border border-gray-300 overflow-hidden relative">
+                <img id="cropImage" src="" class="block max-w-full">
+              </div>
+              <div class="mt-3 flex justify-end gap-2">
+                <button type="button" onclick="cancelCrop()" class="px-3 py-1.5 text-xs bg-gray-200 text-gray-700 rounded font-semibold hover:bg-gray-300 transition-colors">Cancel</button>
+                <button type="button" onclick="applyCrop()" class="px-3 py-1.5 text-xs bg-[#C9A87C] text-white rounded font-semibold hover:bg-[#b09065] transition-colors">Apply Crop</button>
+              </div>
+            </div>
+
           </div>
 
           <!-- Description -->
@@ -184,12 +199,63 @@
       `).join('');
     }
 
-    // Handle File Input Change
+    // Handle File Input Change (Cropper)
+    let cropper = null;
+    let croppedBlob = null;
+
     document.getElementById('imageUpload').addEventListener('change', function(e) {
       if (e.target.files.length > 0) {
-        document.getElementById('fileNameDisplay').innerText = e.target.files[0].name;
+        const file = e.target.files[0];
+        
+        // Ensure it's an image
+        if (!file.type.startsWith('image/')) {
+          alert('Please select an image file (JPEG/PNG)');
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          document.getElementById('cropImage').src = event.target.result;
+          document.getElementById('cropSection').classList.remove('hidden');
+          document.getElementById('fileNameDisplay').innerText = "Crop your image below";
+          
+          if (cropper) { cropper.destroy(); }
+          
+          const imgElement = document.getElementById('cropImage');
+          cropper = new Cropper(imgElement, {
+            aspectRatio: 1, // 1:1 Square aspect ratio!
+            viewMode: 1,
+            autoCropArea: 1,
+            background: false
+          });
+        };
+        reader.readAsDataURL(file);
       }
     });
+
+    function applyCrop() {
+      if (!cropper) return;
+      cropper.getCroppedCanvas({
+        width: 800,
+        height: 800,
+        fillColor: '#fff',
+        imageSmoothingEnabled: true,
+        imageSmoothingQuality: 'high',
+      }).toBlob((blob) => {
+        croppedBlob = blob;
+        document.getElementById('cropSection').classList.add('hidden');
+        document.getElementById('fileNameDisplay').innerText = "✅ Image cropped and ready!";
+        if (cropper) { cropper.destroy(); cropper = null; }
+      }, 'image/jpeg', 0.9);
+    }
+
+    function cancelCrop() {
+      document.getElementById('cropSection').classList.add('hidden');
+      document.getElementById('imageUpload').value = '';
+      croppedBlob = null;
+      document.getElementById('fileNameDisplay').innerText = "Drag and drop or click";
+      if (cropper) { cropper.destroy(); cropper = null; }
+    }
     
     // Mark image for removal
     function markImageForRemoval() {
@@ -236,6 +302,7 @@
     function cancelEdit() {
       editingId = null;
       document.getElementById('addProductForm').reset();
+      cancelCrop(); // Ensure cropper is closed
       document.getElementById('fileNameDisplay').innerText = 'Drag and drop or click';
       document.getElementById('submitBtn').innerText = 'Add Product';
       document.getElementById('cancelEditBtn').classList.add('hidden');
@@ -255,12 +322,11 @@
 
       try {
         let imageUrl = null;
-        const fileInput = document.getElementById('imageUpload');
         
-        // 1. Upload Image if present
-        if (fileInput.files.length > 0) {
+        // 1. Upload Cropped Image if present
+        if (croppedBlob) {
           const formData = new FormData();
-          formData.append('image', fileInput.files[0]);
+          formData.append('image', croppedBlob, 'product-image.jpg');
           const uploadRes = await fetch('/api/upload', { method: 'POST', body: formData });
           const uploadData = await uploadRes.json();
           imageUrl = uploadData.url;
