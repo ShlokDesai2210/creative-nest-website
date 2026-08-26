@@ -1,0 +1,72 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-brand-white text-brand-charcoal font-body antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-brand-charcoal text-white font-medium rounded-md hover:bg-brand-charcoal-light transition-all duration-300 ease-in-out;
+  }
+
+  .btn-whatsapp {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-brand-whatsapp text-white font-semibold rounded-md hover:bg-brand-whatsapp-dark transition-all duration-300 ease-in-out shadow-md hover:shadow-lg;
+  }
+
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 border-2 border-brand-charcoal text-brand-charcoal font-medium rounded-md hover:bg-brand-charcoal hover:text-white transition-all duration-300 ease-in-out;
+  }
+
+  .section-padding {
+    @apply px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20;
+  }
+
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Sold Out ribbon */
+.sold-out-ribbon {
+  position: absolute;
+  top: 12px;
+  left: -8px;
+  background: #DC2626;
+  color: white;
+  padding: 4px 16px 4px 12px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  z-index: 10;
+  clip-path: polygon(0 0, 100% 0, 92% 50%, 100% 100%, 0 100%, 4% 50%);
+}
+
+/* WhatsApp floating button pulse */
+@keyframes whatsapp-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.5); }
+  70% { box-shadow: 0 0 0 14px rgba(37, 211, 102, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+}
+
+.whatsapp-float {
+  animation: whatsapp-pulse 2s infinite;
+}

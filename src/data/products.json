@@ -1,0 +1,138 @@
+{
+  "products": [
+    {
+      "id": "1",
+      "name": "Luxury Gift Hamper — Classic",
+      "slug": "luxury-gift-hamper-classic",
+      "price": 1299,
+      "originalPrice": 1599,
+      "category": "customised-hampers",
+      "images": [],
+      "description": "A beautifully curated gift hamper featuring premium handmade goodies, wrapped with love. Perfect for birthdays, anniversaries, and special occasions. Can be customised with personal messages and preferred items.",
+      "inStock": true,
+      "featured": true,
+      "tags": ["bestseller", "gift", "customisable"],
+      "createdAt": "2026-08-27"
+    },
+    {
+      "id": "2",
+      "name": "Crochet Flower Bouquet",
+      "slug": "crochet-flower-bouquet",
+      "price": 799,
+      "originalPrice": 999,
+      "category": "bouquets",
+      "images": [],
+      "description": "Handcrafted crochet flower bouquet that lasts forever. Each flower is meticulously crocheted by hand. Choose your favorite flowers and colors for a truly personalised gift.",
+      "inStock": true,
+      "featured": true,
+      "tags": ["handmade", "gift", "bestseller"],
+      "createdAt": "2026-08-27"
+    },
+    {
+      "id": "3",
+      "name": "Decorative DIY Plate — Floral",
+      "slug": "decorative-diy-plate-floral",
+      "price": 599,
+      "originalPrice": null,
+      "category": "diy-plates",
+      "images": [],
+      "description": "Beautifully hand-decorated DIY plate with intricate floral patterns. Perfect for wall decor or as a unique gift. Each piece is one-of-a-kind.",
+      "inStock": true,
+      "featured": true,
+      "tags": ["decor", "handmade"],
+      "createdAt": "2026-08-27"
+    },
+    {
+      "id": "4",
+      "name": "Custom Name Plate — Wooden",
+      "slug": "custom-name-plate-wooden",
+      "price": 899,
+      "originalPrice": 1099,
+      "category": "name-plates",
+      "images": [],
+      "description": "Personalised wooden name plate with beautiful calligraphy and floral accents. Perfect for your home entrance, room door, or as a housewarming gift.",
+      "inStock": false,
+      "featured": false,
+      "tags": ["customisable", "home-decor"],
+      "createdAt": "2026-08-27"
+    },
+    {
+      "id": "5",
+      "name": "Photo Frame — Memory Collage",
+      "slug": "photo-frame-memory-collage",
+      "price": 699,
+      "originalPrice": null,
+      "category": "frames",
+      "images": [],
+      "description": "Custom photo frame collage to treasure your favorite memories. Hand-decorated with beautiful embellishments. Share your photos and we'll create magic!",
+      "inStock": true,
+      "featured": true,
+      "tags": ["customisable", "gift", "photo"],
+      "createdAt": "2026-08-27"
+    },
+    {
+      "id": "6",
+      "name": "Photo Customised Gift Box",
+      "slug": "photo-customised-gift-box",
+      "price": 999,
+      "originalPrice": 1299,
+      "category": "photo-customised",
+      "images": [],
+      "description": "A stunning customised gift box featuring your cherished photos, decorated with love. Perfect surprise for birthdays, anniversaries, or just because!",
+      "inStock": false,
+      "featured": false,
+      "tags": ["customisable", "gift", "photo"],
+      "createdAt": "2026-08-27"
+    }
+  ],
+  "categories": [
+    {
+      "id": "customised-hampers",
+      "name": "Customised Hampers",
+      "slug": "customised-hampers",
+      "description": "Thoughtfully curated gift hampers, customised just for you",
+      "image": "",
+      "icon": "gift"
+    },
+    {
+      "id": "bouquets",
+      "name": "Bouquets",
+      "slug": "bouquets",
+      "description": "Handcrafted bouquets that last forever",
+      "image": "",
+      "icon": "flower2"
+    },
+    {
+      "id": "diy-plates",
+      "name": "DIY Plates",
+      "slug": "diy-plates",
+      "description": "Beautiful hand-decorated plates for your home",
+      "image": "",
+      "icon": "palette"
+    },
+    {
+      "id": "name-plates",
+      "name": "Name Plates",
+      "slug": "name-plates",
+      "description": "Personalised name plates crafted with care",
+      "image": "",
+      "icon": "home"
+    },
+    {
+      "id": "frames",
+      "name": "Frames",
+      "slug": "frames",
+      "description": "Custom frames to treasure your memories",
+      "image": "",
+      "icon": "frame"
+    },
+    {
+      "id": "photo-customised",
+      "name": "Photo Customised",
+      "slug": "photo-customised",
+      "description": "Unique photo-customised gifts made with love",
+      "image": "",
+      "icon": "camera"
+    }
+  ]
+}
