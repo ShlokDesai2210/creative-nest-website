@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { Heart, MessageCircle } from "lucide-react";
+import { Heart, MessageCircle, Instagram } from "lucide-react";
 import { getWhatsAppUrl } from "@/lib/whatsapp";
 
 interface CategoryItem {
@@ -23,6 +23,8 @@ const quickLinks = [
   { name: "About Us", href: "/#about" },
   { name: "Contact", href: "/#contact" },
 ];
+
+const instagramUrl = "https://www.instagram.com/creative_nest_by_diya?utm_source=ig_web_button_share_sheet&igsi=ZDNlZDc0MzIxNw==";
 
 export default function Footer() {
   const whatsappUrl = getWhatsAppUrl();
@@ -50,6 +52,17 @@ export default function Footer() {
               to make your cherished memories and special celebrations truly
               unforgettable.
             </p>
+            <div className="pt-2 flex gap-4">
+              <a 
+                href={instagramUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-brand-charcoal-light hover:text-[#E1306C] transition-colors"
+                aria-label="Follow us on Instagram"
+              >
+                <Instagram className="w-5 h-5" />
+              </a>
+            </div>
           </div>
 
           {/* Column 2: Quick Links */}
@@ -97,7 +110,7 @@ export default function Footer() {
             </h4>
             <p className="text-sm text-brand-charcoal-light leading-relaxed">
               Have a custom request or need assistance? Reach out to us directly
-              on WhatsApp.
+              on WhatsApp or Instagram.
             </p>
             <div className="space-y-3 pt-1">
               <p className="text-sm text-brand-charcoal flex items-center gap-2">
@@ -111,16 +124,26 @@ export default function Footer() {
                   +91 81601 30771
                 </a>
               </p>
-              <div>
+              <div className="flex flex-col gap-2">
                 <a
                   href={whatsappUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-brand-whatsapp text-white text-sm font-medium rounded-md hover:bg-brand-whatsapp-dark shadow-sm transition-all duration-200"
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-brand-whatsapp text-white text-sm font-medium rounded-md hover:bg-brand-whatsapp-dark shadow-sm transition-all duration-200"
                   aria-label="Message us on WhatsApp"
                 >
                   <MessageCircle className="w-4 h-4" />
-                  <span>Message us on WhatsApp</span>
+                  <span>WhatsApp</span>
+                </a>
+                <a
+                  href={instagramUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-[#E1306C] text-white text-sm font-medium rounded-md hover:bg-[#C13584] shadow-sm transition-all duration-200"
+                  aria-label="Follow us on Instagram"
+                >
+                  <Instagram className="w-4 h-4" />
+                  <span>Instagram</span>
                 </a>
               </div>
             </div>

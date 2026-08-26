@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Menu, X, MessageCircle } from "lucide-react";
+import { Menu, X, MessageCircle, Instagram } from "lucide-react";
 import { getWhatsAppUrl } from "@/lib/whatsapp";
 
 interface NavLink {
@@ -16,6 +16,8 @@ const navLinks: NavLink[] = [
   { name: "About", href: "/#about" },
   { name: "Contact", href: "/#contact" },
 ];
+
+const instagramUrl = "https://www.instagram.com/creative_nest_by_diya?utm_source=ig_web_button_share_sheet&igsi=ZDNlZDc0MzIxNw==";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -87,8 +89,17 @@ export default function Navbar() {
             ))}
           </nav>
 
-          {/* Desktop WhatsApp Action Button */}
-          <div className="hidden md:flex items-center">
+          {/* Desktop Action Buttons */}
+          <div className="hidden md:flex items-center gap-3">
+            <a
+              href={instagramUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 text-brand-charcoal hover:text-[#E1306C] transition-colors duration-200"
+              aria-label="Follow us on Instagram"
+            >
+              <Instagram className="w-5 h-5" />
+            </a>
             <a
               href={whatsappUrl}
               target="_blank"
@@ -135,7 +146,7 @@ export default function Navbar() {
               {link.name}
             </Link>
           ))}
-          <div className="pt-2">
+          <div className="pt-4 flex flex-col gap-3">
             <a
               href={whatsappUrl}
               target="_blank"
@@ -146,6 +157,17 @@ export default function Navbar() {
             >
               <MessageCircle className="w-4 h-4" />
               <span>Chat on WhatsApp</span>
+            </a>
+            <a
+              href={instagramUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setIsOpen(false)}
+              className="inline-flex items-center justify-center gap-2 w-full px-5 py-3 bg-[#E1306C] text-white text-sm font-medium rounded-full hover:bg-[#C13584] shadow-sm transition-all duration-200"
+              aria-label="Follow us on Instagram"
+            >
+              <Instagram className="w-4 h-4" />
+              <span>Follow on Instagram</span>
             </a>
           </div>
         </div>
