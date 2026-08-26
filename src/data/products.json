@@ -7,14 +7,13 @@
       "price": 300,
       "originalPrice": 500,
       "category": "name-plates",
-      "images": [],
+      "images": [
+        "/products/1787774673696-285_2021_ASUS_TUF_Gaming_-_Graphite_Black.jpg"
+      ],
       "description": "best for gifting",
       "inStock": true,
       "featured": true,
-      "tags": [
-        "handmade",
-        "gift"
-      ],
+      "tags": [],
       "createdAt": "2026-08-26"
     }
   ],
