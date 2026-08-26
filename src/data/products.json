@@ -7,15 +7,13 @@
       "price": 300,
       "originalPrice": 500,
       "category": "name-plates",
-      "images": [
-        "/products/1787775839935-Screenshot_2026-08-27_015035.png"
-      ],
+      "images": [],
       "description": "best for gifting",
       "inStock": true,
       "featured": true,
       "tags": [],
       "createdAt": "2026-08-26",
-      "removeImage": false
+      "removeImage": true
     }
   ],
   "categories": [
