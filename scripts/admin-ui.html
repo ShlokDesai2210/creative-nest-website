@@ -64,6 +64,19 @@
           <!-- Image Upload -->
           <div>
             <label class="block text-sm font-semibold mb-1">Product Image (JPEG/PNG)</label>
+            
+            <!-- Existing Image Preview (Hidden by default) -->
+            <div id="existingImageContainer" class="hidden mb-3 p-3 bg-gray-50 rounded-lg border border-gray-200 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <img id="existingImagePreview" src="" class="w-12 h-12 rounded object-cover border border-gray-300">
+                <span class="text-sm text-gray-600 font-medium">Current Image</span>
+              </div>
+              <button type="button" onclick="markImageForRemoval()" class="text-xs px-3 py-1.5 bg-red-100 text-red-600 font-semibold rounded hover:bg-red-200 transition-colors">
+                Remove
+              </button>
+            </div>
+            <input type="hidden" id="removeImageFlag" value="false">
+
             <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-[#C9A87C] transition-colors bg-gray-50">
               <div class="space-y-1 text-center">
                 <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
@@ -178,6 +191,13 @@
       }
     });
     
+    // Mark image for removal
+    function markImageForRemoval() {
+      document.getElementById('removeImageFlag').value = 'true';
+      document.getElementById('existingImageContainer').classList.add('hidden');
+      document.getElementById('fileNameDisplay').innerText = 'Existing image removed. Upload new if needed.';
+    }
+
     // Start Editing
     function startEdit(id) {
       const p = products.find(prod => prod.id === id);
@@ -192,9 +212,18 @@
       document.getElementById('inStock').checked = p.inStock;
       document.getElementById('featured').checked = p.featured;
       
-      document.getElementById('fileNameDisplay').innerText = (p.images && p.images.length > 0) 
-        ? 'Upload new image to replace existing' 
-        : 'Drag and drop or click';
+      document.getElementById('removeImageFlag').value = 'false';
+      
+      if (p.images && p.images.length > 0) {
+        document.getElementById('existingImagePreview').src = p.images[0];
+        document.getElementById('existingImageContainer').classList.remove('hidden');
+        document.getElementById('existingImageContainer').classList.add('flex');
+        document.getElementById('fileNameDisplay').innerText = 'Upload new image to replace existing';
+      } else {
+        document.getElementById('existingImageContainer').classList.add('hidden');
+        document.getElementById('existingImageContainer').classList.remove('flex');
+        document.getElementById('fileNameDisplay').innerText = 'Drag and drop or click';
+      }
         
       document.getElementById('submitBtn').innerText = 'Update Product';
       document.getElementById('cancelEditBtn').classList.remove('hidden');
@@ -210,6 +239,9 @@
       document.getElementById('fileNameDisplay').innerText = 'Drag and drop or click';
       document.getElementById('submitBtn').innerText = 'Add Product';
       document.getElementById('cancelEditBtn').classList.add('hidden');
+      document.getElementById('existingImageContainer').classList.add('hidden');
+      document.getElementById('existingImageContainer').classList.remove('flex');
+      document.getElementById('removeImageFlag').value = 'false';
       renderProducts();
     }
 
@@ -244,7 +276,8 @@
           inStock: document.getElementById('inStock').checked,
           featured: document.getElementById('featured').checked,
           tags: [],
-          images: imageUrl ? [imageUrl] : []
+          images: imageUrl ? [imageUrl] : [],
+          removeImage: document.getElementById('removeImageFlag').value === 'true'
         };
 
         const url = isUpdating ? `/api/products/${editingId}` : '/api/products';

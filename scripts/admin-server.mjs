@@ -77,8 +77,10 @@ app.put("/api/products/:id", (req, res) => {
       const existing = data.products[index];
       const updated = { ...existing, ...req.body };
       
-      // Keep existing images if no new image was uploaded
-      if (!req.body.images || req.body.images.length === 0) {
+      // Keep existing images if no new image was uploaded, unless user clicked remove
+      if (req.body.removeImage) {
+        updated.images = [];
+      } else if (!req.body.images || req.body.images.length === 0) {
         updated.images = existing.images;
       }
       
