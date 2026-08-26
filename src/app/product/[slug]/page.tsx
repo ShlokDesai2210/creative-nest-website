@@ -8,6 +8,7 @@ import {
   getProductsByCategory,
   getCategoryBySlug,
   Product,
+  getImagePath,
 } from "@/lib/products";
 import { getWhatsAppUrl, getWhatsAppOrderUrl } from "@/lib/whatsapp";
 import ProductCard from "@/components/ProductCard";
@@ -200,7 +201,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
 
               {hasImage ? (
                 <Image
-                  src={product.images[0]}
+                  src={getImagePath(product.images[0])}
                   alt={product.name}
                   fill
                   priority

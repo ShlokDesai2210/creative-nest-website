@@ -5,7 +5,7 @@ export interface Product {
   name: string;
   slug: string;
   price: number;
-  originalPrice: number | null;
+  originalPrice?: number | null;
   category: string;
   images: string[];
   description: string;
@@ -13,6 +13,18 @@ export interface Product {
   featured: boolean;
   tags: string[];
   createdAt: string;
+}
+
+// Helper to fix image paths for GitHub Pages
+export function getImagePath(path: string): string {
+  if (!path) return "";
+  if (path.startsWith("http")) return path;
+  if (process.env.NODE_ENV === "production") {
+    // If the path already has the base path, don't duplicate it
+    if (path.startsWith("/creative-nest-website")) return path;
+    return `/creative-nest-website${path}`;
+  }
+  return path;
 }
 
 export interface Category {

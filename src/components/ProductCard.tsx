@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Product } from "@/lib/products";
+import { Product, getImagePath } from "@/lib/products";
 import { getWhatsAppUrl } from "@/lib/whatsapp";
 import SoldOutBadge from "@/components/SoldOutBadge";
 import {
@@ -61,7 +61,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
           {hasImage ? (
             <Image
-              src={product.images[0]}
+              src={getImagePath(product.images[0])}
               alt={product.name}
               fill
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
