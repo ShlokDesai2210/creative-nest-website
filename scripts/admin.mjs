@@ -147,6 +147,9 @@ function printMenu() {
     `  ${c.green}8${c.reset}  📊  Dashboard / Stats`
   );
   console.log(
+    `  ${c.green}9${c.reset}  🚀  Publish Changes to Live Website`
+  );
+  console.log(
     `  ${c.green}0${c.reset}  🚪  Exit`
   );
   printDivider();
@@ -596,6 +599,32 @@ function showDashboard() {
   console.log("");
 }
 
+import { execSync } from "child_process";
+
+// ─── Feature: Publish to Live Website ────────────────────
+function publishToLive() {
+  console.log(`\n${c.bgBlue}${c.white}${c.bold} 🚀 PUBLISHING CHANGES... ${c.reset}\n`);
+  try {
+    console.log(`  ${c.dim}Saving files...${c.reset}`);
+    execSync("git add src/data/products.json", { stdio: "inherit" });
+    
+    console.log(`  ${c.dim}Committing updates...${c.reset}`);
+    execSync('git commit -m "update: product catalog updated via Admin CLI"', { stdio: "inherit" });
+    
+    console.log(`  ${c.dim}Pushing to GitHub... (This triggers the website build)${c.reset}`);
+    execSync("git push", { stdio: "inherit" });
+    
+    console.log(`\n  ${c.bgGreen}${c.white}${c.bold} ✅ PUBLISHED! ${c.reset}`);
+    console.log(`  Your website is updating in the background. It will be live in ~2 minutes!\n`);
+  } catch (error) {
+    if (error.message.includes("nothing to commit") || error.message.includes("clean")) {
+      console.log(`\n  ${c.yellow}⚠️  No new changes to publish. Your live site is already up to date!${c.reset}\n`);
+    } else {
+      console.log(`\n  ${c.bgRed}${c.white}${c.bold} ❌ ERROR ${c.reset} Failed to publish. Check your internet connection.\n`);
+    }
+  }
+}
+
 // ─── Main Loop ───────────────────────────────────────────
 async function main() {
   clearScreen();
@@ -630,6 +659,9 @@ async function main() {
         break;
       case "8":
         showDashboard();
+        break;
+      case "9":
+        publishToLive();
         break;
       case "0":
       case "exit":
