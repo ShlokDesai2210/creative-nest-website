@@ -2,6 +2,8 @@
 
 **The home of heartfelt gifting.**
 
+🌐 **[Click here to view the live website!](https://shlokdesai2210.github.io/creative-nest-website/)**
+
 A beautiful product showcase website for Creative Nest by Diya — featuring handmade, personalised gifts with WhatsApp-based ordering.
 
 ## 🌟 Features
